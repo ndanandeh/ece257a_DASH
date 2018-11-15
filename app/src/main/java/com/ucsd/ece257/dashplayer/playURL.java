@@ -36,6 +36,11 @@ import java.util.Timer;
 //This class plays the dash video linked by the URL
 public class playURL extends AppCompatActivity {
 
+    static {
+        System.loadLibrary("obtain_RSRQ-lib");
+
+    }
+
     private static final String filePath = "/storage/emulated/0/testRead.txt"; //file to read data from. For now just store a number defining max bit rate here
 
     private DataSource.Factory mediaDataSourceFactory; //Used to create data sources (our video)
@@ -47,6 +52,9 @@ public class playURL extends AppCompatActivity {
     private SimpleExoPlayer simpleExoPlayer;  //the player object itself
     private int maxBitRate = 300000; //default defined maximum bitrate
     private TextView bitRateText;
+
+    //shared Library
+    public native void getRSRQ();
 
     // These variables are for updating the program (every delay seconds)
     Handler h = new Handler();
@@ -72,6 +80,13 @@ public class playURL extends AppCompatActivity {
     public void onStart(){
         super.onStart();
         initializePlayer(); //This is where all the nasty stuff happens
+
+
+        // obtain RSRQ
+        getRSRQ();
+
+
+
 
         //text field to show max bit rate on screen
         bitRateText = (TextView)findViewById(R.id.textView);
