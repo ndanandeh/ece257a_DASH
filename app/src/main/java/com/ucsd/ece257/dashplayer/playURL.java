@@ -38,7 +38,7 @@ public class playURL extends AppCompatActivity {
 
     private static final String filePath = "/storage/emulated/0/testRead.txt"; //file to read data from. For now just store a number defining max bit rate here
 
-    private DataSource.Factory mediaDataSourceFactory; //Used to create data sources (our video)
+    private DataSource.Factory dataSourceFactory; //Used to create data sources (our video)
     private PlayerView exoPlayerView; //view that the player is defined inside of
     private Intent intent;  //intent used to create this activity
     private BandwidthMeter bandwidthMeter; //used to estimate bandwidth? This may not be used...
@@ -48,9 +48,11 @@ public class playURL extends AppCompatActivity {
     private int maxBitRate = 300000; //default defined maximum bitrate
     private TextView bitRateText;
 
+    private int count = 0;
+
     // These variables are for updating the program (every delay seconds)
     Handler h = new Handler();
-    int delay = 1000; // ms
+    int delay = 2*1000; // ms
     Runnable runnable;
 
     @Override
@@ -65,7 +67,6 @@ public class playURL extends AppCompatActivity {
         //link the exoplayerView variable to the view that is defined in the layout.xml file
         exoPlayerView = (PlayerView) findViewById(R.id.player_view);
 
-        mediaDataSourceFactory  = new DefaultHttpDataSourceFactory("dashPlayer");
     }
 
     @Override //method called after onCreate()
@@ -74,24 +75,31 @@ public class playURL extends AppCompatActivity {
         initializePlayer(); //This is where all the nasty stuff happens
 
         //text field to show max bit rate on screen
-        bitRateText = (TextView)findViewById(R.id.textView);
+        //bitRateText = (TextView)findViewById(R.id.textView);
 
         //Thread to Select Video Quality every delay seconds
-        h.postDelayed( runnable = new Runnable() {
-            //Function currently selects bit rate that is present in file at filePath
-            public void run() {
-                String maxBR = getFileContent(filePath);
-                maxBitRate = Integer.valueOf(maxBR);
-                trackSelector.setParameters(
-                        trackSelector
-                                .buildUponParameters()
-                                .setMaxVideoBitrate(maxBitRate)); // set max bit rate
-
-                //update text field to show the max bit rate on screen
-                bitRateText.setText("Max Bit Rate: " + String.valueOf(maxBR));
-
-            }
-        }, delay);
+//        h.postDelayed( runnable = new Runnable() {
+//            //Function currently selects bit rate that is present in file at filePath
+//            public void run() {
+//                count ++;
+//                Log.d("DEBUGTHREAD","Called " + Integer.toString(count));
+//                String maxBR = getFileContent(filePath);
+//                maxBitRate = maxBitRate * 2;
+//                if(maxBitRate>5000000)
+//                    maxBitRate = 10000;
+//                //maxBitRate = Integer.valueOf(maxBR);
+//                trackSelector.setParameters(
+//                        trackSelector
+//                                .buildUponParameters()
+//                                .setMaxVideoBitrate(maxBitRate)); // set max bit rate
+//
+//                //update text field to show the max bit rate on screen
+//                bitRateText.setText("Max Bit Rate: " + maxBitRate);
+//
+//                h.postDelayed(runnable,delay);
+//
+//            }
+//        }, delay);
 
     }
 
@@ -112,6 +120,9 @@ public class playURL extends AppCompatActivity {
     //basically starts DASH player with URL inputted, and if no URL is inputted plays the aws link
     void initializePlayer(){
 
+
+        dataSourceFactory  = new DefaultHttpDataSourceFactory("dashPlayer");
+
         exoPlayerView.requestFocus();
 
         //if the string is inputted then go to it, else play the default aws site
@@ -129,39 +140,32 @@ public class playURL extends AppCompatActivity {
 
 
         DashChunkSource.Factory dashChunkFactory = new DefaultDashChunkSource.Factory( new DefaultHttpDataSourceFactory("dashPlayer"));
-        DashMediaSource.Factory dashMediaSourceFactory = new DashMediaSource.Factory(dashChunkFactory,mediaDataSourceFactory);
+        DashMediaSource.Factory dashMediaSourceFactory = new DashMediaSource.Factory(dashChunkFactory,dataSourceFactory);
 
         DashMediaSource dashMediaSource = dashMediaSourceFactory.createMediaSource(uri);
 
-        bandwidthMeter = new DefaultBandwidthMeter();
+        bandwidthMeter = new myBandwidthMeter();
 
         Log.d("BANDWIDTH_EST", String.valueOf(bandwidthMeter.getBitrateEstimate()));
 
         TrackSelection.Factory trackSelectFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
         trackSelector = new DefaultTrackSelector(trackSelectFactory);
 
-
-
         simpleExoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector);
+
+        Log.d("WINDOW_DEBUG", Integer.toString((simpleExoPlayer.getCurrentWindowIndex())));
 
         int index = simpleExoPlayer.getCurrentWindowIndex();
         long dur = simpleExoPlayer.getDuration();
         Log.d("INDEX_DEBUG",String.valueOf(index));
         Log.d("INDEX_DEBUG",String.valueOf(dur));
 
-        par = new DefaultTrackSelector.ParametersBuilder().build();
+        //par = new DefaultTrackSelector.ParametersBuilder().build();
 
-        trackSelector.setParameters(par);
+        //trackSelector.setParameters(par);
 
-//        maxBitRate = 300000;
-//        trackSelector.setParameters(
-//                trackSelector
-//                        .buildUponParameters()
-//                        .setMaxVideoBitrate(maxBitRate)); // set to minimum quality?
-
-
-        int bR = par.maxVideoBitrate;
-        Log.d("BR_DEBUG", String.valueOf(bR));
+        DefaultTrackSelector.Parameters p = trackSelector.getParameters();
+        Log.d("BR_DEBUG", String.valueOf(p.maxVideoBitrate));
 
         exoPlayerView.setPlayer(simpleExoPlayer);
 
