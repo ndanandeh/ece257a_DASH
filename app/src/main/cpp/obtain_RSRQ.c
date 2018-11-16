@@ -7,7 +7,7 @@
 #include <string.h>
 #include <jni.h>
 
-JNIEXPORT void Java_com_ucsd_ece257_dashplayer_playURL_getRSRQ(void)
+JNIEXPORT int Java_com_ucsd_ece257_dashplayer_playURL_getRSRQ(void)
 {
     //文件指针
     FILE *fp;
@@ -25,7 +25,7 @@ JNIEXPORT void Java_com_ucsd_ece257_dashplayer_playURL_getRSRQ(void)
     if ((fp = fopen(fileName, "r")) == NULL)
     {
         printf("error!");
-        return;
+        return -1;
     }
 
     //移动指针离文件结尾 1 字节处
@@ -60,4 +60,5 @@ JNIEXPORT void Java_com_ucsd_ece257_dashplayer_playURL_getRSRQ(void)
     result=result + 0.1*(reading[k]-'0');
    printf("%f\n",result);
     fclose(fp);
+    return 0;
 }
