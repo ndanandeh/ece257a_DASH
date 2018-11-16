@@ -1,6 +1,9 @@
 package com.ucsd.ece257.dashplayer;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -33,6 +36,8 @@ import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Timer;
 
+import static android.os.Build.*;
+
 //This class plays the dash video linked by the URL
 public class playURL extends AppCompatActivity {
 
@@ -55,7 +60,7 @@ public class playURL extends AppCompatActivity {
 
 
     //shared Library
-    public native void getRSRQ();
+    public native int getRSRQ();
 
     // These variables are for updating the program (every delay seconds)
     Handler h = new Handler();
@@ -79,11 +84,35 @@ public class playURL extends AppCompatActivity {
     @Override //method called after onCreate()
     public void onStart(){
         super.onStart();
-        initializePlayer(); //This is where all the nasty stuff happens
 
 
         // obtain RSRQ
-        getRSRQ();
+        if (getRSRQ() == -1)
+        {
+            AlertDialog.Builder builder;
+            if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
+                builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
+            } else {
+                builder = new AlertDialog.Builder(this);
+            }
+            builder.setTitle("Error")
+                    .setMessage("Obtain RSRQ Failed")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        }
+
+        //we should stop here if we failed to get RSRQ above
+        initializePlayer(); //This is where all the nasty stuff happens
 
 
 
