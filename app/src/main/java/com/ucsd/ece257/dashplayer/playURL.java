@@ -43,6 +43,7 @@ public class playURL extends AppCompatActivity {
 
     static {
         System.loadLibrary("obtain_RSRQ-lib");
+        System.loadLibrary("obtain_Nant-lib");
 
     }
 
@@ -60,7 +61,8 @@ public class playURL extends AppCompatActivity {
 
 
     //shared Library
-    public native int getRSRQ();
+    public native double getRSRQ();
+    public native int getNant();
 
     // These variables are for updating the program (every delay seconds)
     Handler h = new Handler();
@@ -85,9 +87,11 @@ public class playURL extends AppCompatActivity {
     public void onStart(){
         super.onStart();
 
+        int nant = getNant();
+        double rsrq = getRSRQ();
 
         // obtain RSRQ
-        if (getRSRQ() == -1)
+        if (rsrq == -1)
         {
             AlertDialog.Builder builder;
             if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
@@ -111,6 +115,35 @@ public class playURL extends AppCompatActivity {
                     .show();
         }
 
+
+        // obtain Nant
+        if (nant == -1)
+        {
+            AlertDialog.Builder builder;
+            if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
+                builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
+            } else {
+                builder = new AlertDialog.Builder(this);
+            }
+            builder.setTitle("Error")
+                    .setMessage("Obtain Nant Failed")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        }
+
+        System.out.println("RSRQ is " + rsrq);
+
+        System.out.println("Nant is " + nant);
         //we should stop here if we failed to get RSRQ above
         initializePlayer(); //This is where all the nasty stuff happens
 
