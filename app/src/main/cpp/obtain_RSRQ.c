@@ -7,7 +7,7 @@
 #include <string.h>
 #include <jni.h>
 
-JNIEXPORT int Java_com_ucsd_ece257_dashplayer_playURL_getRSRQ(void)
+JNIEXPORT double Java_com_ucsd_ece257_dashplayer_playURL_getRSRQ(void)
 {
     //文件指针
     FILE *fp;
@@ -60,5 +60,5 @@ JNIEXPORT int Java_com_ucsd_ece257_dashplayer_playURL_getRSRQ(void)
     result=result + 0.1*(reading[k]-'0');
    printf("%f\n",result);
     fclose(fp);
-    return 0;
+    return result;
 }
