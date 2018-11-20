@@ -174,7 +174,7 @@ public class playURL extends AppCompatActivity {
             message = intent.getStringExtra(InputURL.MY_URL);
         }
         else{
-            message = "https://s3.us-east-2.amazonaws.com/ece257atrial/dash+content/manifest.mpd ";
+            message = "http://rdmedia.bbc.co.uk/dash/ondemand/testcard/1/client_manifest-events.mpd";
         }
         Uri uri = Uri.parse(message);
 

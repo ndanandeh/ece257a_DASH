@@ -14,7 +14,7 @@ JNIEXPORT int Java_com_ucsd_ece257_dashplayer_playURL_getRSRQ(void)
     char reading[10];
     memset(reading,'A',sizeof(reading));
     //文件路径
-    char fileName[] = "/storage/emulated/0/mobileinsight/log/test.txt";
+    char fileName[] = "/storage/emulated/0/mobileinsight/log/test1.txt";
     //用来保存从文件读取的字符
     char ch;
 
