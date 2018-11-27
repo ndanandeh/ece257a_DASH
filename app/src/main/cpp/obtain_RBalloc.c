@@ -8,13 +8,14 @@
 #include <jni.h>
 
 //currently gets rballoc 1[0] and 1[1]
-JNIEXPORT int * Java_com_ucsd_ece257_dashplayer_playURL_getRBalloc(void)
+JNIEXPORT jintArray Java_com_ucsd_ece257_dashplayer_playURL_getRBalloc(JNIEnv *env)
 {
     //文件指针
     FILE *fp;
     int numf[2] = {0,0};
-    char reading[30];
-    memset(reading,'A',sizeof(reading));
+    int nf2 = 0;
+    //char reading[30];
+   // memset(reading,'A',sizeof(reading));
     //文件路径
     char fileName[] = "/storage/emulated/0/mobileinsight/log/test1.txt";
     //用来保存从文件读取的字符
@@ -60,13 +61,14 @@ JNIEXPORT int * Java_com_ucsd_ece257_dashplayer_playURL_getRBalloc(void)
     ch = fgetc(fp);
     ch = fgetc(fp);
 
-    k = 0;
+   // k = 0;
     while (ch!='<')
     {
         ch = fgetc(fp);
-        reading[k++]=ch;
+        //reading[k++]=ch;
         if(ch == 'f'){
             numf[1]++;
+            //nf2++;
         }
     }
 
@@ -99,18 +101,25 @@ JNIEXPORT int * Java_com_ucsd_ece257_dashplayer_playURL_getRBalloc(void)
     while (ch!='<')
     {
         ch = fgetc(fp);
-        reading[k++]=ch;
+       // reading[k++]=ch;
         if(ch == 'f'){
             numf[0]++;
+            //nf2++;
         }
     }
 
 
+    jintArray result = (*env)->NewIntArray(env,2);
+    if(result == NULL){
+        return NULL;
+    }
 
+    (*env)->SetIntArrayRegion(env,result,0,2,numf);
 
 
     //int result=(int)strtol(reading,NULL,16);
     //printf("%d\n",result);
     fclose(fp);
-    return numf;
+   // return numf;
+    return result;
 }
