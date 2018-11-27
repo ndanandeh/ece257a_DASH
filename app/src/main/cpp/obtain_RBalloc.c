@@ -7,11 +7,12 @@
 #include <string.h>
 #include <jni.h>
 
-JNIEXPORT int Java_com_ucsd_ece257_dashplayer_playURL_getRBalloc(void)
+//currently gets rballoc 1[0] and 1[1]
+JNIEXPORT int * Java_com_ucsd_ece257_dashplayer_playURL_getRBalloc(void)
 {
     //文件指针
     FILE *fp;
-    int numf = 0;
+    int numf[2] = {0,0};
     char reading[30];
     memset(reading,'A',sizeof(reading));
     //文件路径
@@ -32,7 +33,45 @@ JNIEXPORT int Java_com_ucsd_ece257_dashplayer_playURL_getRBalloc(void)
     //移动指针离文件结尾 1 字节处
     fseek(fp, i, SEEK_END);
 
-    //读取一个字符
+
+
+
+    // GET 1[1]
+    ch = fgetc(fp);
+    while(ch != EOF){
+        while(ch!='1'){
+            i--;
+            fseek(fp, i, SEEK_END);
+            ch = fgetc(fp);
+        }
+        ch = fgetc(fp);
+        if(ch!= '['){
+            continue;
+        }
+        ch = fgetc(fp);
+        if(ch == '1'){
+            break;
+        }
+    }
+
+    ch = fgetc(fp);
+    ch = fgetc(fp);
+    ch = fgetc(fp);
+    ch = fgetc(fp);
+    ch = fgetc(fp);
+
+    k = 0;
+    while (ch!='<')
+    {
+        ch = fgetc(fp);
+        reading[k++]=ch;
+        if(ch == 'f'){
+            numf[1]++;
+        }
+    }
+
+
+    // GET 1[0]
     ch = fgetc(fp);
     while(ch != EOF){
         while(ch!='1'){
@@ -56,15 +95,18 @@ JNIEXPORT int Java_com_ucsd_ece257_dashplayer_playURL_getRBalloc(void)
     ch = fgetc(fp);
     ch = fgetc(fp);
 
-    i = 0;
+    k = 0;
     while (ch!='<')
     {
         ch = fgetc(fp);
-        reading[i++]=ch;
+        reading[k++]=ch;
         if(ch == 'f'){
-            numf++;
+            numf[0]++;
         }
     }
+
+
+
 
 
     //int result=(int)strtol(reading,NULL,16);
