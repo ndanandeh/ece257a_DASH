@@ -1,5 +1,5 @@
 //
-// Created by Max Xing on 11/19/18.
+// Created by nathan on 11/20/18.
 //
 
 #include <stdio.h>
@@ -7,23 +7,21 @@
 #include <string.h>
 #include <jni.h>
 
-
-JNIEXPORT int Java_com_ucsd_ece257_dashplayer_playURL_getNant(void) {
+JNIEXPORT int Java_com_ucsd_ece257_dashplayer_playURL_getRBalloc(void)
+{
     //文件指针
     FILE *fp;
-    char reading[10];
+    int numf = 0;
+    char reading[30];
     memset(reading,'A',sizeof(reading));
     //文件路径
     char fileName[] = "/storage/emulated/0/mobileinsight/log/test1.txt";
-
-
-
     //用来保存从文件读取的字符
     char ch;
 
     //文件内部指针 fseek()函数的偏移
     int i = -1;
-
+    int k = 0;  //保存小数点位置
     //如果文件打开失败
     if ((fp = fopen(fileName, "r")) == NULL)
     {
@@ -34,54 +32,43 @@ JNIEXPORT int Java_com_ucsd_ece257_dashplayer_playURL_getNant(void) {
     //移动指针离文件结尾 1 字节处
     fseek(fp, i, SEEK_END);
 
-    int results[5];
-    int j = 0;
     //读取一个字符
-    while (1) {
-        ch = fgetc(fp);
-        while (ch != '(') {
+    ch = fgetc(fp);
+    while(ch != EOF){
+        while(ch!='1'){
             i--;
             fseek(fp, i, SEEK_END);
             ch = fgetc(fp);
         }
         ch = fgetc(fp);
-        if (ch != 'M')
+        if(ch!= '['){
             continue;
-
+        }
         ch = fgetc(fp);
-        ch = fgetc(fp);
-        ch = fgetc(fp);
-        ch = fgetc(fp);
-
-        results[j] = ch - '0';
-        j++;
-        if (j == 5)
+        if(ch == '0'){
             break;
+        }
+    }
+
+    ch = fgetc(fp);
+    ch = fgetc(fp);
+    ch = fgetc(fp);
+    ch = fgetc(fp);
+    ch = fgetc(fp);
+
+    i = 0;
+    while (ch!='<')
+    {
+        ch = fgetc(fp);
+        reading[i++]=ch;
+        if(ch == 'f'){
+            numf++;
+        }
     }
 
 
-//    i=0;
-//
-//    while (ch!='<')
-//    {
-//        ch = fgetc(fp);
-//        reading[i++]=ch;
-//
-//    }
-
-
-    //char *num=new char[i];
-//    char num[i];
-//
-//    for(int j=0;j<i;j++){
-//        num[j]=reading[j];
-//    }
-//    int result=atoi(num);
-//    fclose(fp);
-//    printf("%d\n",result);
-
-
-    return 1;
-
-
+    //int result=(int)strtol(reading,NULL,16);
+    //printf("%d\n",result);
+    fclose(fp);
+    return numf;
 }

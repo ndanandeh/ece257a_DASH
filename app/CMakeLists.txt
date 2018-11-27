@@ -31,3 +31,21 @@ add_library( # Specifies the name of the library.
         # Provides a relative path to your source file(s).
         src/main/cpp/obtain_Nant.c)
 
+add_library(
+        obtain_RBalloc-lib
+
+        SHARED
+
+        src/main/cpp/obtain_RBalloc.c)
+
+
+#add_library( # Specifies the name of the library.
+#        test-lib
+#
+#
+#        # Sets the library as a shared library.
+#        SHARED
+#
+#        # Provides a relative path to your source file(s).
+#        src/main/cpp/test.c)
+

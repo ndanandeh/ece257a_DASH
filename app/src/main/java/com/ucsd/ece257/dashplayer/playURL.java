@@ -44,6 +44,7 @@ public class playURL extends AppCompatActivity {
     static {
         System.loadLibrary("obtain_RSRQ-lib");
         System.loadLibrary("obtain_Nant-lib");
+        System.loadLibrary("obtain_RBalloc-lib");
 
     }
 
@@ -63,6 +64,7 @@ public class playURL extends AppCompatActivity {
     //shared Library
     public native double getRSRQ();
     public native int getNant();
+    public native int getRBalloc();
 
     // These variables are for updating the program (every delay seconds)
     Handler h = new Handler();
@@ -89,6 +91,9 @@ public class playURL extends AppCompatActivity {
 
         int nant = getNant();
         double rsrq = getRSRQ();
+        int rbs = getRBalloc();
+
+        Log.d("RBALLOC_DEBUG", Integer.toString(rbs));
 
         // obtain RSRQ
         if (rsrq == -1)
