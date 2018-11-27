@@ -14,7 +14,7 @@ JNIEXPORT double Java_com_ucsd_ece257_dashplayer_playURL_getRSRQ(void)
     char reading[10];
     memset(reading,'A',sizeof(reading));
     //文件路径
-    char fileName[] = "/sdcard/Download/test1.txt";
+    char fileName[] = "/sdcard/Download/pdsch_and_intraFreq.txt";
     //用来保存从文件读取的字符
     char ch;
 
@@ -32,33 +32,37 @@ JNIEXPORT double Java_com_ucsd_ece257_dashplayer_playURL_getRSRQ(void)
     fseek(fp, i, SEEK_END);
 
     //读取一个字符
-    ch = fgetc(fp);
-    while(ch!='Q'){
-      i--;
-      fseek(fp, i, SEEK_END);
-      ch = fgetc(fp);
-   }
-   ch=fgetc(fp);
-   ch=fgetc(fp);
-   ch=fgetc(fp);
-   i=0;
-   while (ch!='<')
-    {
+    while(1) {
+
+        while (ch != '(') {
+            ch = fgetc(fp);
+            i--;
+            fseek(fp, i, SEEK_END);
+        }
         ch = fgetc(fp);
-        reading[i++]=ch;
-        if(ch == '.') k=i;
-    }
-    i--;
+        if (ch != 'd')
+            continue;
+        ch = fgetc(fp);
+        if (ch != 'B')
+            continue;
+        ch = fgetc(fp);
+        if (ch != ')')
+            continue;
 
-    //char *num=new char[i];
-    char num[i];
-
-    for(int j=0;j<i;j++){
-        num[j]=reading[j];
+        break;
     }
-    float result=atoi(num);
-    result=result + 0.1*(reading[k]-'0');
-   printf("%f\n",result);
+    ch = fgetc(fp);
+    ch = fgetc(fp);
+    ch = fgetc(fp);
+
+    i = 0;
+    while (ch != '<') {
+        ch = fgetc(fp);
+        reading[i++] = ch ;
+    }
+
+    double result = -1.0 * strtod(reading, NULL);
+    printf("%lf\n",result);
     fclose(fp);
     return result;
 }

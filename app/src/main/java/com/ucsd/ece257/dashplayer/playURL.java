@@ -47,7 +47,7 @@ public class playURL extends AppCompatActivity {
 
     }
 
-    private static final String filePath = "/storage/emulated/0/testRead.txt"; //file to read data from. For now just store a number defining max bit rate here
+    private static final String filePath = "/storage/emulated/0/pdsch_and_intraFreq.txt"; //file to read data from. For now just store a number defining max bit rate here
 
     private DataSource.Factory dataSourceFactory; //Used to create data sources (our video)
     private PlayerView exoPlayerView; //view that the player is defined inside of
