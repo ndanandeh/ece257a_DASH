@@ -38,14 +38,11 @@ add_library(
 
         src/main/cpp/obtain_RBalloc.c)
 
+add_library(
+        obtain_TS-lib
 
-#add_library( # Specifies the name of the library.
-#        test-lib
-#
-#
-#        # Sets the library as a shared library.
-#        SHARED
-#
-#        # Provides a relative path to your source file(s).
-#        src/main/cpp/test.c)
+        SHARED
+
+        src/main/cpp/obtain_TS.c)
+
 

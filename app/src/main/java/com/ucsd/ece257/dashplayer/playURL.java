@@ -45,6 +45,8 @@ public class playURL extends AppCompatActivity {
         System.loadLibrary("obtain_RSRQ-lib");
         System.loadLibrary("obtain_Nant-lib");
         System.loadLibrary("obtain_RBalloc-lib");
+        //System.loadLibrary("obtain_fullParse-lib");
+        System.loadLibrary("obtain_TS-lib");
 
     }
 
@@ -65,6 +67,7 @@ public class playURL extends AppCompatActivity {
     public native double getRSRQ();
     public native int getNant();
     public native int[] getRBalloc();
+    public native data[] getTS(double time);
 
     // These variables are for updating the program (every delay seconds)
     Handler h = new Handler();
@@ -89,67 +92,71 @@ public class playURL extends AppCompatActivity {
     public void onStart(){
         super.onStart();
 
-        int nant = getNant();
-        double rsrq = getRSRQ();
-        int [] rbs = getRBalloc();
-
-       Log.d("RBALLOC_DEBUG", Integer.toString(rbs[0]) + " " + Integer.toString(rbs[1]));
+        //int nant = getNant();
+        // double rsrq = getRSRQ();
+        //int [] rbs = getRBalloc();
+      // Log.d("RBALLOC_DEBUG", Integer.toString(rbs[0]) + " " + Integer.toString(rbs[1]));
 
         // obtain RSRQ
-        if (rsrq == -1)
-        {
-            AlertDialog.Builder builder;
-            if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
-                builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
-            } else {
-                builder = new AlertDialog.Builder(this);
-            }
-            builder.setTitle("Error")
-                    .setMessage("Obtain RSRQ Failed")
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
-                    })
-                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
-                    })
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .show();
-        }
-
-
-        // obtain Nant
-        if (nant == -1)
-        {
-            AlertDialog.Builder builder;
-            if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
-                builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
-            } else {
-                builder = new AlertDialog.Builder(this);
-            }
-            builder.setTitle("Error")
-                    .setMessage("Obtain Nant Failed")
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
-                    })
-                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
-                    })
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .show();
-        }
-
-        System.out.println("RSRQ is " + rsrq);
-
-        System.out.println("Nant is " + nant);
+//        if (rsrq == -1)
+//        {
+//            AlertDialog.Builder builder;
+//            if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
+//                builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
+//            } else {
+//                builder = new AlertDialog.Builder(this);
+//            }
+//            builder.setTitle("Error")
+//                    .setMessage("Obtain RSRQ Failed")
+//                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int which) {
+//
+//                        }
+//                    })
+//                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int which) {
+//
+//                        }
+//                    })
+//                    .setIcon(android.R.drawable.ic_dialog_alert)
+//                    .show();
+//        }
+//
+//
+//        // obtain Nant
+//        if (nant == -1)
+//        {
+//            AlertDialog.Builder builder;
+//            if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
+//                builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
+//            } else {
+//                builder = new AlertDialog.Builder(this);
+//            }
+//            builder.setTitle("Error")
+//                    .setMessage("Obtain Nant Failed")
+//                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int which) {
+//
+//                        }
+//                    })
+//                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int which) {
+//
+//                        }
+//                    })
+//                    .setIcon(android.R.drawable.ic_dialog_alert)
+//                    .show();
+//        }
+//
+//        System.out.println("RSRQ is " + rsrq);
+//
+//        System.out.println("Nant is " + nant);
         //we should stop here if we failed to get RSRQ above
+
+
+        //this gets all of the data from the last .1 seconds. test[99] also contains the # of frames taken
+        data [] test = getTS(.1);
+
         initializePlayer(); //This is where all the nasty stuff happens
 
 
@@ -159,28 +166,19 @@ public class playURL extends AppCompatActivity {
         //bitRateText = (TextView)findViewById(R.id.textView);
 
         //Thread to Select Video Quality every delay seconds
-//        h.postDelayed( runnable = new Runnable() {
-//            //Function currently selects bit rate that is present in file at filePath
-//            public void run() {
-//                count ++;
-//                Log.d("DEBUGTHREAD","Called " + Integer.toString(count));
-//                String maxBR = getFileContent(filePath);
-//                maxBitRate = maxBitRate * 2;
-//                if(maxBitRate>5000000)
-//                    maxBitRate = 10000;
-//                //maxBitRate = Integer.valueOf(maxBR);
-//                trackSelector.setParameters(
-//                        trackSelector
-//                                .buildUponParameters()
-//                                .setMaxVideoBitrate(maxBitRate)); // set max bit rate
-//
-//                //update text field to show the max bit rate on screen
-//                bitRateText.setText("Max Bit Rate: " + maxBitRate);
-//
-//                h.postDelayed(runnable,delay);
-//
-//            }
-//        }, delay);
+        h.postDelayed( runnable = new Runnable() {
+            //Function currently selects bit rate that is present in file at filePath
+            public void run() {
+                //count ++;
+                //Log.d("DEBUGTHREAD","Called " + Integer.toString(count));
+
+               int [] rbs = getRBalloc();
+               Log.d("RB_THREAD", Integer.toString(rbs[0]) + " " + Integer.toString(rbs[1]));
+
+                h.postDelayed(runnable,delay);
+
+            }
+        }, delay);
 
     }
 
