@@ -28,15 +28,16 @@ JNIEXPORT jobjectArray Java_com_ucsd_ece257_dashplayer_playURL_getTS(JNIEnv *env
     int RB10 =0;
     int RB01 =0;
     int RB00 =0;
-    double RSRQ =0;
+    double RSRQ1 =0;
+    double RSRQ0 =0;
 
     int isFirst = 1;
     int stop = 0;
     double firstTS;
     int currentPos = 0; //current position in dataArray
     jclass dataClass = (*env)->FindClass(env,"com/ucsd/ece257/dashplayer/data");
-    jmethodID constructor = (*env)->GetMethodID(env, dataClass, "<init>", "(IIIIIIIIID)V");
-    jobjectArray dataArr = (*env)->NewObjectArray(env,100, dataClass, (*env)->NewObject(env,dataClass,constructor, nant, MCS0, MCS1, TBS0, TBS1, RB11, RB10, RB01, RB00, RSRQ) );
+    jmethodID constructor = (*env)->GetMethodID(env, dataClass, "<init>", "(IIIIIIIIIDD)V");
+    jobjectArray dataArr = (*env)->NewObjectArray(env,100, dataClass, (*env)->NewObject(env,dataClass,constructor, nant, MCS0, MCS1, TBS0, TBS1, RB11, RB10, RB01, RB00, RSRQ1, RSRQ0) );
 
 
     int i = -1;
@@ -569,9 +570,55 @@ JNIEXPORT jobjectArray Java_com_ucsd_ece257_dashplayer_playURL_getTS(JNIEnv *env
                 //is interfrequency packet
             else {
 
-
-                //get RSRQ
+                //get RSRQ1
                 fseek(fp, posCurr, 0);
+                while (1) {
+                    ch = fgetc(fp);
+                    while (ch != 'Q') {
+                        i--;
+                        fseek(fp, -2, SEEK_CUR);
+                        ch = fgetc(fp);
+                    }
+                    ch = fgetc(fp);
+                    if (ch != '(') {
+                        fseek(fp, -3, SEEK_CUR);
+                        continue;
+                    }
+
+                    tempPos = ftell(fp) - 3;
+                    ch = fgetc(fp);
+                    ch = fgetc(fp);
+                    ch = fgetc(fp);
+                    ch = fgetc(fp);
+                    ch = fgetc(fp);
+                    ch = fgetc(fp);
+                    ch = fgetc(fp);
+
+
+                    int ii = 0;
+                    while (ch != '<') {
+                        buffer[ii++] = ch;
+                        ch = fgetc(fp);
+                    }
+
+
+                    char *tempBuff = (char *) malloc(ii + 1);
+                    for (int jj = 0; jj < ii; jj++) {
+                        tempBuff[jj] = buffer[jj];
+                    }
+                    tempBuff[ii] = '\n'; //put non-number here to guarantee end of number
+
+                    RSRQ1 = strtod(tempBuff, NULL);
+                    RSRQ1 *= -1;
+                    free(tempBuff);
+                    tempBuff = NULL;
+                    break;
+                }
+
+
+
+                //get RSRQ1
+                fseek(fp, tempPos, 0);
                 while (1) {
                     ch = fgetc(fp);
                     while (ch != 'Q') {
@@ -607,12 +654,15 @@ JNIEXPORT jobjectArray Java_com_ucsd_ece257_dashplayer_playURL_getTS(JNIEnv *env
                     }
                     tempBuff[ii] = '\n'; //put non-number here to guarantee end of number
 
-                    RSRQ = strtod(tempBuff, NULL);
-                    RSRQ *= -1;
+                    RSRQ0 = strtod(tempBuff, NULL);
+                    RSRQ0 *= -1;
                     free(tempBuff);
                     tempBuff = NULL;
                     break;
                 }
+
+
+
 
             }
 
@@ -636,7 +686,7 @@ JNIEXPORT jobjectArray Java_com_ucsd_ece257_dashplayer_playURL_getTS(JNIEnv *env
         (*env)->SetObjectArrayElement(env, dataArr, currentPos,
                                       (*env)->NewObject(env, dataClass, constructor, nant, MCS0,
                                                         MCS1, TBS0, TBS1, RB11, RB10, RB01, RB00,
-                                                        RSRQ));
+                                                        RSRQ1, RSRQ0));
 
         currentPos++;
 
@@ -644,7 +694,7 @@ JNIEXPORT jobjectArray Java_com_ucsd_ece257_dashplayer_playURL_getTS(JNIEnv *env
             (*env)->SetObjectArrayElement(env, dataArr, 99,
                                           (*env)->NewObject(env, dataClass, constructor, currentPos, currentPos,
                                                             currentPos, currentPos, currentPos, currentPos, currentPos, currentPos, currentPos,
-                                                            currentPos));
+                                                            currentPos, currentPos));
         }
         //set all fields of 99 to # of frames processed
     }
