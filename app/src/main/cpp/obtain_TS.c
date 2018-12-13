@@ -7,7 +7,7 @@
 #include <string.h>
 #include <jni.h>
 
-JNIEXPORT jobjectArray Java_com_ucsd_ece257_dashplayer_playURL_getTS(JNIEnv *env, jdouble time)
+JNIEXPORT jobjectArray Java_com_ucsd_ece257_dashplayer_myBandwidthMeter_getTS(JNIEnv *env, jdouble time)
 {
     FILE *fp;
     char sizeReading[2];
@@ -30,14 +30,15 @@ JNIEXPORT jobjectArray Java_com_ucsd_ece257_dashplayer_playURL_getTS(JNIEnv *env
     int RB00 =0;
     double RSRQ1 =0;
     double RSRQ0 =0;
+    double ts;
 
     int isFirst = 1;
     int stop = 0;
     double firstTS;
     int currentPos = 0; //current position in dataArray
     jclass dataClass = (*env)->FindClass(env,"com/ucsd/ece257/dashplayer/data");
-    jmethodID constructor = (*env)->GetMethodID(env, dataClass, "<init>", "(IIIIIIIIIDD)V");
-    jobjectArray dataArr = (*env)->NewObjectArray(env,100, dataClass, (*env)->NewObject(env,dataClass,constructor, nant, MCS0, MCS1, TBS0, TBS1, RB11, RB10, RB01, RB00, RSRQ1, RSRQ0) );
+    jmethodID constructor = (*env)->GetMethodID(env, dataClass, "<init>", "(IIIIIIIIIDDD)V");
+    jobjectArray dataArr = (*env)->NewObjectArray(env,100, dataClass, (*env)->NewObject(env,dataClass,constructor, nant, MCS0, MCS1, TBS0, TBS1, RB11, RB10, RB01, RB00, RSRQ1, RSRQ0, ts) );
 
 
     int i = -1;
@@ -70,6 +71,8 @@ JNIEXPORT jobjectArray Java_com_ucsd_ece257_dashplayer_playURL_getTS(JNIEnv *env
             ch = fgetc(fp);
         }
 
+        size = 0; // fix?
+
         pos = ftell(fp);
 
         //search for the message length 68 = PDSCH packet, 52 = Intra_Frequency packet
@@ -97,7 +100,7 @@ JNIEXPORT jobjectArray Java_com_ucsd_ece257_dashplayer_playURL_getTS(JNIEnv *env
             size = atoi(sizeReading);
             tempPos = tempPos - 32;
             fseek(fp, tempPos, 0); //point to the end of the previous line
-            ch = fgetc(fp);
+            ch = fgetc(fp);     //TODO: REMOVE THIS
             ch = fgetc(fp);
             ch = fgetc(fp);
             ch = fgetc(fp);
@@ -157,7 +160,8 @@ JNIEXPORT jobjectArray Java_com_ucsd_ece257_dashplayer_playURL_getTS(JNIEnv *env
                     }
                     tempBuff[ii] = '\n'; //put non-number here to guarantee end of number
 
-                    double ts = strtod(tempBuff, NULL);
+                            ts = strtod(tempBuff, NULL);
+
                     if(isFirst){
                         firstTS = ts;
                         isFirst = 0;
@@ -686,7 +690,7 @@ JNIEXPORT jobjectArray Java_com_ucsd_ece257_dashplayer_playURL_getTS(JNIEnv *env
         (*env)->SetObjectArrayElement(env, dataArr, currentPos,
                                       (*env)->NewObject(env, dataClass, constructor, nant, MCS0,
                                                         MCS1, TBS0, TBS1, RB11, RB10, RB01, RB00,
-                                                        RSRQ1, RSRQ0));
+                                                        RSRQ1, RSRQ0, ts));
 
         currentPos++;
 
@@ -694,7 +698,7 @@ JNIEXPORT jobjectArray Java_com_ucsd_ece257_dashplayer_playURL_getTS(JNIEnv *env
             (*env)->SetObjectArrayElement(env, dataArr, 99,
                                           (*env)->NewObject(env, dataClass, constructor, currentPos, currentPos,
                                                             currentPos, currentPos, currentPos, currentPos, currentPos, currentPos, currentPos,
-                                                            currentPos, currentPos));
+                                                            currentPos, currentPos, currentPos));
         }
         //set all fields of 99 to # of frames processed
     }

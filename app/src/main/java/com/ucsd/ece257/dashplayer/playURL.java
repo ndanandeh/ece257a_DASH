@@ -46,7 +46,7 @@ public class playURL extends AppCompatActivity {
         System.loadLibrary("obtain_Nant-lib");
         System.loadLibrary("obtain_RBalloc-lib");
         //System.loadLibrary("obtain_fullParse-lib");
-        System.loadLibrary("obtain_TS-lib");
+//        System.loadLibrary("obtain_TS-lib");
 
     }
 
@@ -67,7 +67,7 @@ public class playURL extends AppCompatActivity {
     public native double getRSRQ();
     public native int getNant();
     public native int[] getRBalloc();
-    public native data[] getTS(double time);
+    //public native data[] getTS(double time);
 
     // These variables are for updating the program (every delay seconds)
     Handler h = new Handler();
@@ -155,7 +155,7 @@ public class playURL extends AppCompatActivity {
 
 
         //this gets all of the data from the last .1 seconds. test[99] also contains the # of frames taken
-        data [] test = getTS(.1);
+   //     data [] test = getTS(.1);
 
         initializePlayer(); //This is where all the nasty stuff happens
 
@@ -165,20 +165,20 @@ public class playURL extends AppCompatActivity {
         //text field to show max bit rate on screen
         //bitRateText = (TextView)findViewById(R.id.textView);
 
-        //Thread to Select Video Quality every delay seconds
-        h.postDelayed( runnable = new Runnable() {
-            //Function currently selects bit rate that is present in file at filePath
-            public void run() {
-                //count ++;
-                //Log.d("DEBUGTHREAD","Called " + Integer.toString(count));
-
-               int [] rbs = getRBalloc();
-               Log.d("RB_THREAD", Integer.toString(rbs[0]) + " " + Integer.toString(rbs[1]));
-
-                h.postDelayed(runnable,delay);
-
-            }
-        }, delay);
+//        //Thread to Select Video Quality every delay seconds
+//        h.postDelayed( runnable = new Runnable() {
+//            //Function currently selects bit rate that is present in file at filePath
+//            public void run() {
+//                //count ++;
+//                //Log.d("DEBUGTHREAD","Called " + Integer.toString(count));
+//
+//               int [] rbs = getRBalloc();
+//               Log.d("RB_THREAD", Integer.toString(rbs[0]) + " " + Integer.toString(rbs[1]));
+//
+//                h.postDelayed(runnable,delay);
+//
+//            }
+//        }, delay);
 
     }
 
